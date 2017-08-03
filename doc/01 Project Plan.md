@@ -1,10 +1,12 @@
+# Project Plan
+
 The aim of this document is to capture the plan of this project on a high level.
 The structure of this document is based on the IEEE template, with some sections removed.
 Note that this is a **live document** that may be updated at any time during the development.
 
-# Introduction
+## Introduction
 
-## Overview (Executive Summary)
+### Overview (Executive Summary)
 The goal of this project is to create `TV Aficio`,
 a tool that informs its users with newly released episodes or seasons of their favorite TV series.
 *Why? The existing major websites with information about TV series do not have such notification feature*
@@ -16,58 +18,58 @@ but it will rather rely on one of the existing internet databases (e.g., thetvdb
 
 The project is run in an agile fashion. The work is planned and divided accross Sprints, and the development is done following the Test Driven Development principles.
 
-## Deliverables
+### Deliverables
 The ultimate deliverables are:
 * Core system with the notification functionality
 * Deployment manual
 * Web user interface
 * User manual
 
-# Management Structure
+## Management Structure
 
-## Project Lifecycle
+### Project Lifecycle
 *TO DO: Describe in detail the lifecycle for the project, with phases, deliverables, and dates abstractly to provide a clear view of the project time line from a process standpoint.*
 
-## Project Organization
+### Project Organization
 This project currently has one member that is taking all the necessary roles.
 
-## Risk and Asset Management
+### Risk and Asset Management
 *TO DO*
 
-# Planning and Control
-## Estimate
+## Planning and Control
+### Estimate
 *TO DO: describe any and all estimates to date relating to the project (time, code size, costs).*
 
-## Resource Identification
-### Time and Cost
+### Resource Identification
+#### Time and Cost
 *TO DO: available calendar time for the project, man hours, costs of web hosting?*
-### Milestones
+#### Milestones
 *TO DO: list key milestones for the projects.  Milestones should have a name and a due date.  Milestones are NOT tasks, but like binary yes/no checkpoints for the project. Example, Initial Prototype Tested.*
-### Schedule
+#### Schedule
 *TO DO: annotated Gantt or CPM or PERT charts.*
 
-# Technical Process
-## Engineering
+## Technical Process
+### Engineering
 *TO DO: environment, tools, methods, and techniques related to software engineering.* 
-### Environment
-### Methods, Tools and Techniques
+#### Environment
+#### Methods, Tools and Techniques
 *TO DO: CASE tools (like Rational Rose or Visio), UML, Markdown*
-## Technology 
+### Technology 
 *TO DO: environment, tools, methods, and techniques related to technology.*
-### Environment
-### Methods, Tools, and Techniques
+#### Environment
+#### Methods, Tools, and Techniques
 *TO DO: IDE, type of computers, other technology*
-## Infrastructure
+### Infrastructure
 *TO DO: what needs to be done to create development environments*
 
-# Supporting Plans
-## Configuration Management
+## Supporting Plans
+### Configuration Management
 *TO DO: what method or tool will you use on your project (like GIT)*
-## Quality Assurance
+### Quality Assurance
 *TO DO: how will project meets quality goals. Bug tracking and reporting.*
-## Testing
+### Testing
 *TO DO: Test activities*
-## Deployment and Integration
+### Deployment and Integration
 *TO DO: How to hand off the project to users.*
-## Operations and Maintenance
+### Operations and Maintenance
 *TO DO: System operation after deployment, link installation guide.*
