@@ -1,5 +1,5 @@
 The aim of this document is to capture the plan of this project on a high level.
-The structure of this document is based on the IEEE template, with some sections removed that are not used.
+The structure of this document is based on the IEEE template, with some sections removed.
 Note that this is a **live document** that may be updated at any time during the development.
 
 # Introduction
