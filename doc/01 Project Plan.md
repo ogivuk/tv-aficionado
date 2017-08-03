@@ -1,20 +1,20 @@
 # Project Plan
 
-The aim of this document is to capture the plan of this project on a high level.
-The structure of this document is based on the IEEE template, with some sections removed.
+The aim of this document is to capture the plan of this project.
+The structure is based on the IEEE template, with some sections removed.
 Note that this is a **live document** that may be updated at any time during the development.
 
 ## Introduction
 
 ### Overview (Executive Summary)
 The goal of this project is to create `TV Aficio`,
-a tool that informs its users with newly released episodes or seasons of their favorite TV series.
-*Why? The existing major websites with information about TV series do not have such notification feature*
+a tool that informs users with newly released episodes or seasons of their favorite TV series.
+`TV Aficio` is initiated as the existing major websites with information about TV series do not have such notification feature.
 
-`TV Aficio` will contain user profiles, with the list of favorite TV shows for every user,
-and consult with major TV series internet databases on coming releases of episodes and seasons.
-`TV Aficio` will not build a comprenhensive database of TV series,
-but it will rather rely on one of the existing internet databases (e.g., thetvdb.com, imdb.com).
+`TV Aficio` contains user profiles, with the list of favorite TV shows for every user,
+and consults with major TV series internet databases on coming releases of episodes and seasons.
+`TV Aficio` is not a comprenhensive database of TV series,
+but it rather relies on existing internet databases (e.g., thetvdb.com, imdb.com).
 
 The project is run in an agile fashion. The work is planned and divided accross Sprints, and the development is done following the Test Driven Development principles.
 
