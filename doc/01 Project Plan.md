@@ -28,7 +28,14 @@ The ultimate deliverables are:
 ## Management Structure
 
 ### Project Lifecycle
-*TO DO: Describe in detail the lifecycle for the project, with phases, deliverables, and dates abstractly to provide a clear view of the project time line from a process standpoint.*
+The project is run in an agile manner, following the SCRUM methodology as much as possible:
+* Sprints are 2 weeks long
+    * Sprints start on Sunday every second week, and they end on Saturday 2 weeks from start.
+    * After every sprint there is a release.
+* SCRUM board can be seen under *tv-aficio* project on Github
+    * Stories are issues labeled as *enhancement*. Stories are moved between stages: Backlog->Sprint Backlog->In Progress->Done.
+    * Tasks are not visible on the board, but are contained within their stories.
+    * Bugs are issues labeled as *bugs*.
 
 ### Project Organization
 This project currently has one member that is taking all the necessary roles.
