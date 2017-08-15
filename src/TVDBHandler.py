@@ -8,7 +8,7 @@
 
 class TVDBHandler:
     "Handles the connection to external source of TV Series Information"
-    def getNewEpisodeDate(self, name):
+    def getNextEpisodeDate(self, name):
         pass
-    def getNewEpisodeDate(self, uid):
+    def getNextEpisodeDate(self, uid):
         pass

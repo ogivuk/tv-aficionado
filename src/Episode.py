@@ -5,11 +5,13 @@
 #
 
 class Episode:
-    "Handles the connection to external source of TV Series Information"
+    "Contains information about a single episode."
     def __init__(self):
         self.name = ""
-        self.releaseDate = Nothing
+        self.releaseDate = None
         self.season = 0
-        self.number=  0
+        self.number =  0
         self.shortDesc = ""
         self.uid = ""
+        self.season = None
+        self.tvShow = None

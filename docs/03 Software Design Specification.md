@@ -9,11 +9,15 @@ Source code of the Class Diagram:
 https://yuml.me/diagram/scruffy/class/
 [TVDBHandler||+getNextEpisode(name: string): Episode;+getNextEpisode(uid: string): Episode],
 [TheTVDBHandler|+apiKey: string;+userName: string; +userKey: string;+authenticated: int;-jwtToken: string;_authURL: string|+TheTVDBHandler(userName: string;userKey: string;apiKey: string);+authenticate(): void;+getNextEpisode(name: string): Episode;+getNextEpisode(uid: int): Episode],
-[Episode|+name: string; +releaseDate: Datetime; +season: int; +number: int; +shortDesc: string; +uid: string],
+[TVSeries|+name: string;+shortDesc: string;+uid: string|+getNextEpisode(): Episode],
+[Season|+number: int;+tvSeries: TVSeries],
+[Episode|+name: string;+releaseDate: Datetime;+season: int;+number: int;+shortDesc: string;+uid: string],
 [PythonLib::Datetime],
 [TheTVDB.com],
 [TVDBHandler]^[TheTVDBHandler],
-[TVDBHandler]<>->[Episode],
+[TVDBHandler]<>->[TVSeries],
+[TVSeries]++tvSeries-seasons 1..*>[Season],
+[Season]++season-episodes 1..*>[Episode],
 [Episode]uses-.->[PythonLib::Datetime],
 [TheTVDBHandler]uses-.->[TheTVDB.com]
 )
