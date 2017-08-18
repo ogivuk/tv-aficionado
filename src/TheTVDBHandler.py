@@ -5,11 +5,10 @@
 #
 
 # TO DO:
-# 1. add language support, force english
-# 2. handle paging (results in more than 1 page)
 # 3. Use classes, especially TVSeries,
 #    it will be easier later for the backend writting into the DB
 # 4. Handle error resonse messages
+# 5. Create Unit tests
 
 import json
 import urllib2
@@ -27,14 +26,14 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
             "authentication_login" : "https://api.thetvdb.com/login",
             "authentication_refresh" : "https://api.thetvdb.com/refresh_token",
             "search_TVSeries" : "https://api.thetvdb.com/search/series?name=",
-            "episodes" : "https://api.thetvdb.com/series/$uid/episodes"
+            "episodes" : "https://api.thetvdb.com/series/$uid/episodes?page=$pageNumber"
         }
         self._authenticationToken = {
             "jwtToken" : "",
             "expiresOn" : None
         }
 
-    def authenticate(self):
+    def _checkAuthentication(self):
         "Performs authentication: first time or refresh"
         if (self._authenticationToken["jwtToken"] == "") or (self._authenticationToken["expiresOn"] < datetime.datetime.now()):
             "First authentication, or authentication has expired"
@@ -46,6 +45,7 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
             req = urllib2.Request(self._urls["authentication_login"])
             req.add_header('Accept', 'application/json')
             req.add_header('Content-Type', 'application/json')
+            req.add_header('Accept-Language', 'en')
             try:
                 response = urllib2.urlopen(req, json.dumps(data))
                 self._authenticationToken["jwtToken"] = json.loads(response.read())[u"token"]
@@ -65,6 +65,7 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
                 req = urllib2.Request(self._urls["authentication_refresh"])
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
+                req.add_header('Accept-Language', 'en')
                 req.add_header('Authorization', 'Bearer '+self._jwtToken)
                 try:
                     response = urllib2.urlopen(req)
@@ -82,14 +83,31 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
                 # The token is still valid (at least for an hour longer)
                 pass
 
+    def _getDataFromSource(self, requestUrl):
+        self._checkAuthentication()
+        req = urllib2.Request(requestUrl)
+        req.add_header('Accept', 'application/json')
+        req.add_header('Content-Type', 'application/json')
+        req.add_header('Accept-Language', 'en')
+        req.add_header('Authorization', 'Bearer '+self._authenticationToken["jwtToken"])
+        try:
+            response = urllib2.urlopen(req)
+            data = json.loads(response.read())
+            response.close()
+            return data
+        except (urllib2.HTTPError, urllib2.URLError), e:
+            print('Error: ' + str(e.reason))
+            return json.dumps("{}")
+
+
     def getTVSeries(self, name):
-        if self.authenticated == 0:
-            self.authenticate()
+        self._checkAuthentication()
         req = urllib2.Request(self._urls["search_TVSeries"]+name)
         req.add_header('Accept', 'application/json')
         req.add_header('Content-Type', 'application/json')
         req.add_header('Authorization', 'Bearer '+self._jwtToken)
         tvSeries = None
+
         try:
             response = urllib2.urlopen(req)
             tvSeries = TVSeries.TVSeries()
@@ -105,88 +123,53 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
 
     def getTVSeriesUID(self, name):
         "Returns the UID of the TV Series on thetvdb.com"
-        # Check first the authentication
-        self.authenticate()
-        if self._authenticationToken["jwtToken"] == "":
-            #Something went wrong with authentication
-            return None
-
-        req = urllib2.Request(self._urls["search_TVSeries"]+name.replace(" ","%20"))
-        req.add_header('Accept', 'application/json')
-        req.add_header('Content-Type', 'application/json')
-        req.add_header('Authorization', 'Bearer '+self._authenticationToken["jwtToken"])
-        try:
-            response = urllib2.urlopen(req)
-            data = json.loads(response.read())[u"data"][0]
-            uid = data[u"id"]
-            response.close()
-            return uid
-        except (urllib2.HTTPError, urllib2.URLError), e:
-            print('Error: ' + str(e.reason))
-            return None
+        url = self._urls["search_TVSeries"]+name.replace(" ","%20")
+        data = self._getDataFromSource(url)[u"data"][0]
+        return data[u"id"]
 
     def getNextEpisodeDate(self, uid):   
         "Returns the release date of the next episode"
-        self.authenticate()
-        if self._authenticationToken["jwtToken"] == "":
-            #Something went wrong with authentication
-            return None
+        episodes = self.getAllEpisodes(uid)
+        todaysDate = datetime.date.today()
+        notAiredEpisodesDates = []
+        for episode in episodes:
+            if episode["firstAired"] != "" and datetime.datetime.strptime(episode["firstAired"], '%Y-%m-%d').date()>=todaysDate:
+                notAiredEpisodesDates.append(episode["firstAired"])
+        if len(notAiredEpisodesDates)>0:
+            daysDifference = datetime.datetime.strptime(min(notAiredEpisodesDates), '%Y-%m-%d').date()-todaysDate
+            return(min(notAiredEpisodesDates) + " (in " + str(daysDifference.days) + " days).")
+        else:
+            return "No episode scheduled"
 
-        req = urllib2.Request(self._urls["episodes"].replace("$uid",str(uid)))
-        req.add_header('Accept', 'application/json')
-        req.add_header('Content-Type', 'application/json')
-        req.add_header('Authorization', 'Bearer '+self._authenticationToken["jwtToken"])
-        try:
-            response = urllib2.urlopen(req)
-            episodes = json.loads(response.read())[u"data"]
-            response.close()
-            todaysDate = datetime.date.today()
-            notAiredEpisodesDates = []
-            for episode in episodes:
-                if episode["firstAired"] != "" and datetime.datetime.strptime(episode["firstAired"], '%Y-%m-%d').date()>=todaysDate:
-                    notAiredEpisodesDates.append(episode["firstAired"])
-            if len(notAiredEpisodesDates)>0:
-                daysDifference = datetime.datetime.strptime(min(notAiredEpisodesDates), '%Y-%m-%d').date()-todaysDate
-                return(min(notAiredEpisodesDates) + " (in " + str(daysDifference.days) + " days).")
-            else:
-                return "No episode scheduled"
-        except (urllib2.HTTPError, urllib2.URLError), e:
-            print('Authentication Error: ' + str(e.reason))
-            return None
+    def getAllEpisodes(self, uid):
+        episodes = []
+        nextPage = 1
+        lastPage = 1 #to be readjusted after the first received data
+        while nextPage != None :
+            url = self._urls["episodes"].replace("$uid",str(uid)).replace("$pageNumber",str(nextPage))
+            data = self._getDataFromSource(url)
+            episodes = episodes + data[u"data"]
+            nextPage = data[u"links"][u"next"]
+        return episodes
 
     def getLatestEpisodeDate(self, uid):   
         "Returns the release date of the most recent episode"
-        self.authenticate()
-        if self._authenticationToken["jwtToken"] == "":
-            #Something went wrong with authentication
-            return None
-
-        req = urllib2.Request(self._urls["episodes"].replace("$uid",str(uid)))
-        req.add_header('Accept', 'application/json')
-        req.add_header('Content-Type', 'application/json')
-        req.add_header('Authorization', 'Bearer '+self._authenticationToken["jwtToken"])
-        try:
-            response = urllib2.urlopen(req)
-            episodes = json.loads(response.read())[u"data"]
-            response.close()
-            todaysDate = datetime.date.today()
-            airedEpisodesDates = []
-            for episode in episodes:
-                if episode["firstAired"] != "" and datetime.datetime.strptime(episode["firstAired"], '%Y-%m-%d').date()<todaysDate:
-                    airedEpisodesDates.append(episode["firstAired"])
-            if len(airedEpisodesDates)>0:
-                daysDifference = datetime.datetime.strptime(max(airedEpisodesDates), '%Y-%m-%d').date()-todaysDate
-                return(max(airedEpisodesDates) + " (" + str(-daysDifference.days) + " days ago).")
-            else:
-                return("The series has not starte airing yet.")
-        except (urllib2.HTTPError, urllib2.URLError), e:
-            print('Authentication Error: ' + str(e.reason))
-            return None
+        episodes = self.getAllEpisodes(uid)
+        todaysDate = datetime.date.today()
+        airedEpisodesDates = []
+        for episode in episodes:
+            if episode["firstAired"] != "" and datetime.datetime.strptime(episode["firstAired"], '%Y-%m-%d').date()<todaysDate:
+                airedEpisodesDates.append(episode["firstAired"])
+        if len(airedEpisodesDates)>0:
+            daysDifference = datetime.datetime.strptime(max(airedEpisodesDates), '%Y-%m-%d').date()-todaysDate
+            return(max(airedEpisodesDates) + " (" + str(-daysDifference.days) + " days ago).")
+        else:
+            return("The series has not starte airing yet.")
 
 if __name__ == "__main__":
     # Authenticate
     handler = TheTVDBHandler("Ognjen","EC797502870D09D4","1845172E818BDDF7")
-    handler.authenticate()
+#    handler.authenticate()
 #    if handler.authenticated != 1:
 #        print("Authentication failed")
 #        exit()
@@ -210,3 +193,19 @@ if __name__ == "__main__":
     uid = handler.getTVSeriesUID("Silicon Valley")
     print ("Silicon Valley latest: " + handler.getLatestEpisodeDate(uid))
     print ("Silicon Valley next: " + handler.getNextEpisodeDate(uid))
+    tvShow = "The Americans (2013)"
+    uid = handler.getTVSeriesUID(tvShow)
+    print (tvShow + " latest: " + handler.getLatestEpisodeDate(uid))
+    print (tvShow + " next: " + handler.getNextEpisodeDate(uid))
+    tvShow = "Vikings"
+    uid = handler.getTVSeriesUID(tvShow)
+    print (tvShow + " latest: " + handler.getLatestEpisodeDate(uid))
+    print (tvShow + " next: " + handler.getNextEpisodeDate(uid))
+    tvShow = "Better Call Saul"
+    uid = handler.getTVSeriesUID(tvShow)
+    print (tvShow + " latest: " + handler.getLatestEpisodeDate(uid))
+    print (tvShow + " next: " + handler.getNextEpisodeDate(uid))
+    tvShow = "Narcos"
+    uid = handler.getTVSeriesUID(tvShow)
+    print (tvShow + " latest: " + handler.getLatestEpisodeDate(uid))
+    print (tvShow + " next: " + handler.getNextEpisodeDate(uid))
