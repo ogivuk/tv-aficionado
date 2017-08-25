@@ -5,6 +5,7 @@
 #
 
 import json
+import urllib
 import urllib2
 import datetime
 import TVSeries
@@ -107,7 +108,7 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
 
     def getTVSeriesUID(self, name):
         "Returns the UID of the TV Series on thetvdb.com"
-        url = self._urls["search_TVSeries"]+name.replace(" ","%20")
+        url = self._urls["search_TVSeries"]+urllib.quote_plus(name)
         data = self._getDataFromSource(url)[u"data"][0]
         return data[u"id"]
 
@@ -149,7 +150,7 @@ if __name__ == "__main__":
         "Game of Thrones" : 121361,
         "The Crown" : 305574,
         "Silicon Valley" : 277165,
-        "The Americans" : 261690,
+        "The Americans (2013)" : 261690,
         "Vikings" : 260449,
         "Better Call Saul" : 273181,
         "Narcos" : 282670,
