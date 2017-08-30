@@ -12,22 +12,34 @@ import TVSeries
 import TVDBHandler
 
 class TheTVDBHandler (TVDBHandler.TVDBHandler):
-    "Handles the connection to thetvdb.com"
-    def __init__(self, userName, userKey, apiKey):
-        self.userName = userName
-        self.userKey = userKey
-        self.apiKey = apiKey
+    "Handles the connection to thetvdb.com, receives config in JSON format."
+    def __init__(self, config):
+        # parse the configuration parameters
+        cfg = json.loads(config)
+        self.userName = cfg["userName"]
+        self.userKey = cfg["userKey"]
+        self.apiKey = cfg["apiKey"]
         self._urls = {
-            "authentication_login" : "https://api.thetvdb.com/login",
-            "authentication_refresh" : "https://api.thetvdb.com/refresh_token",
-            "search_TVSeries" : "https://api.thetvdb.com/search/series?name=",
-            "series_episodes" : "https://api.thetvdb.com/series/$uid/episodes?page=$pageNumber",
-            "series_info" : "https://api.thetvdb.com/series/$uid"
+            "authentication_login" : cfg["urls"]["authentication_login"],
+            "authentication_refresh" : cfg["urls"]["authentication_refresh"],
+            "search_TVSeries" : {
+                "url" : cfg["urls"]["search_TVSeries"]["url"],
+                "param" : cfg["urls"]["search_TVSeries"]["param"]
+            },
+            "series_episodes" : {
+                "url": cfg["urls"]["series_episodes"]["url"],
+                "param1" : cfg["urls"]["series_episodes"]["param1"],
+                "param2" : cfg["urls"]["series_episodes"]["param2"]
+            },
+            "series_info" : {
+                "url" : cfg["urls"]["series_info"]["url"],
+                "param" : cfg["urls"]["series_info"]["param"]
+            }
         }
         self._authenticationToken = {
             "jwtToken" : "",
             "expiresOn" : None,
-            "validity_inHours" : 24
+            "validity_inHours" : cfg["token_validity"]
         }
 
     def _checkAuthentication(self):
@@ -81,7 +93,8 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
                 pass
 
     def getTVSeries(self, uid):
-        url = self._urls["series_info"].replace("$uid",str(uid))
+        url = self._urls["series_info"]["url"]\
+            .replace(self._urls["series_info"]["param"],str(uid))
         data = self._getDataFromSource(url)
         tvSeries = TVSeries.TVSeries()
         tvSeries.uid = uid
@@ -108,7 +121,9 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
 
     def getTVSeriesUID(self, name):
         "Returns the UID of the TV Series on thetvdb.com"
-        url = self._urls["search_TVSeries"]+urllib.quote_plus(name)
+        url = self._urls["search_TVSeries"]["url"]\
+            .replace(self._urls["search_TVSeries"]["param"],urllib.quote_plus(name))
+        #url = self._urls["search_TVSeries"]+urllib.quote_plus(name)
         data = self._getDataFromSource(url)[u"data"][0]
         return data[u"id"]
 
@@ -116,7 +131,9 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
         episodes = []
         nextPage = 1
         while nextPage != None :
-            url = self._urls["series_episodes"].replace("$uid",str(uid)).replace("$pageNumber",str(nextPage))
+            url = self._urls["series_episodes"]["url"]\
+                .replace(self._urls["series_episodes"]["param1"],str(uid))\
+                .replace(self._urls["series_episodes"]["param2"],str(nextPage))
             data = self._getDataFromSource(url)
             episodes = episodes + data[u"data"]
             nextPage = data[u"links"][u"next"]

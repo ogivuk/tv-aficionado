@@ -5,9 +5,34 @@
 #
 
 import datetime
+import json
 import TheTVDBHandler
 
-handler = TheTVDBHandler.TheTVDBHandler("Ognjen","EC797502870D09D4","1845172E818BDDF7")
+theTVDBHandler_config = {
+    "userName" : "Ognjen",
+    "userKey" : "EC797502870D09D4",
+    "apiKey" : "1845172E818BDDF7",
+    "token_validity" : 24,
+    "urls": {
+        "authentication_login" : "https://api.thetvdb.com/login",
+        "authentication_refresh" : "https://api.thetvdb.com/refresh_token",
+        "search_TVSeries" : {
+                "url" : "https://api.thetvdb.com/search/series?name=$name",
+                "param" : "$name"
+        },
+        "series_episodes" : {
+            "url" : "https://api.thetvdb.com/series/$uid/episodes?page=$pageNumber",
+            "param1" : "$uid",
+            "param2" : "$pageNumber"
+        },
+        "series_info" : {
+            "url" : "https://api.thetvdb.com/series/$uid",
+            "param" : "$uid"
+        }
+    }
+}
+
+handler = TheTVDBHandler.TheTVDBHandler(json.dumps(theTVDBHandler_config))
 
 tvSeriesNamesAndIDs = {
     "Suits" : 247808,
