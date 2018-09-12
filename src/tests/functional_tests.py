@@ -1,6 +1,32 @@
 from selenium import webdriver
 import unittest
 
+class SmokeTest(unittest.TestCase):
+
+    def setUp(self):
+        self.browser_Firefox = webdriver.Firefox()
+        self.browser_Chrome = webdriver.Chrome()
+    
+    def test_webpage_opens_in_Firefox(self):
+        # Alice has heard about a new cool website about TV shows.
+        # Alice tries to open the homepage of TV-Aficio in Firefox.
+        self.browser_Firefox.get('http://localhost:8000')
+
+        # Alice sees that the webpage opens by noticing 'TV-Aficio' in the page title.
+        self.assertIn('TV-Aficio', self.browser_Firefox.title)
+
+    def test_webpage_opens_in_Chrome(self):
+        # Alice has heard about a new cool website about TV shows.
+        # Alice tries to open the homepage of TV-Aficio in Chrome.
+        self.browser_Chrome.get('http://localhost:8000')
+
+        # Alice sees that the webpage opens by noticing 'TV-Aficio' in the page title.
+        self.assertIn('TV-Aficio', self.browser_Chrome.title)
+
+    def tearDown(self):
+        self.browser_Firefox.quit()
+        self.browser_Chrome.quit()
+
 class NewVisitorTest(unittest.TestCase):
 
     def setUp(self):
@@ -10,8 +36,8 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        # Alice has heard about a new cool website about TV shows
-        # Alice opens the homepage of TV-Aficio
+        # Alice has heard about a new cool website about TV shows.
+        # Alice opens the homepage of TV-Aficio.
         self.browser.get('http://localhost:8000')
 
         # Alice notices 'TV-Aficio' in the page title and in the header
@@ -40,4 +66,4 @@ class NewVisitorTest(unittest.TestCase):
 # Satisfied, she goes back to sleep
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)
