@@ -54,8 +54,11 @@ tvSeriesNamesAndIDs = {
     "Sherlock" : 176941,
     "Sneaky Pete" : 300166,
     "Taboo (2017)" : 292157,
-    "The Mick" : 311818,
-    "Westworld" : 296762
+    "The Blacklist" : 266189,
+    "Westworld" : 296762,
+    "New Girl" : 248682,
+    "Love" : 305378,
+    "Peaky Blinders" : 270915
 }
 
 for (tvSeriesName, tvSeriesID) in tvSeriesNamesAndIDs.items():

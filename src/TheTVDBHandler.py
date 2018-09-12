@@ -14,6 +14,8 @@ import TVDBHandler
 class TheTVDBHandler (TVDBHandler.TVDBHandler):
     "Handles the connection to thetvdb.com, receives config in JSON format."
     def __init__(self, config):
+        # make the dependency on urllib2 explicit to help unit testing (Dependency Injection)
+        self._http_client = urllib2
         # parse the configuration parameters
         cfg = json.loads(config)
         self.userName = cfg["userName"]
@@ -51,17 +53,17 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
                 "userkey": self.userKey,
                 "username": self.userName
             }
-            req = urllib2.Request(self._urls["authentication_login"])
+            req = self._http_client.Request(self._urls["authentication_login"])
             req.add_header('Accept', 'application/json')
             req.add_header('Content-Type', 'application/json')
             req.add_header('Accept-Language', 'en')
             try:
-                response = urllib2.urlopen(req, json.dumps(data))
+                response = self._http_client.urlopen(req, json.dumps(data))
                 self._authenticationToken["jwtToken"] = json.loads(response.read())[u"token"]
-                "The token expires in 24h"
+                #The token expires in 24h
                 self._authenticationToken["expiresOn"] = datetime.datetime.now() + datetime.timedelta(hours=self._authenticationToken["validity_inHours"])
                 response.close()
-            except (urllib2.HTTPError, urllib2.URLError), e:
+            except (self._http_client.HTTPError, self._http_client.URLError), e:
                 print('Error: ' + str(e.reason))
                 self._authenticationToken = {
                     "jwtToken" : "",
@@ -71,18 +73,18 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
         else:
             if self._authenticationToken["expiresOn"] - datetime.datetime.now() < datetime.timedelta(hours=1):
                 # Refresh the token
-                req = urllib2.Request(self._urls["authentication_refresh"])
+                req = self._http_client.Request(self._urls["authentication_refresh"])
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
                 req.add_header('Accept-Language', 'en')
                 req.add_header('Authorization', 'Bearer '+self._jwtToken)
                 try:
-                    response = urllib2.urlopen(req)
+                    response = self._http_client.urlopen(req)
                     self._authenticationToken["jwtToken"] = json.loads(response.read())[u"token"]
                     # The token expires in 24h
                     self._authenticationToken["expiresOn"] = datetime.datetime.now() + datetime.timedelta(hours=24)
                     response.close()
-                except (urllib2.HTTPError, urllib2.URLError), e:
+                except (self._http_client.HTTPError, self._http_client.URLError), e:
                     print('Authentication Error: ' + str(e.reason))
                     self._authenticationToken = {
                         "jwtToken" : "",
@@ -142,16 +144,16 @@ class TheTVDBHandler (TVDBHandler.TVDBHandler):
     def _getDataFromSource(self, requestUrl):
         "Returns data obtained from the source TVDB for given URL"
         self._checkAuthentication()
-        req = urllib2.Request(requestUrl)
+        req = self._http_client.Request(requestUrl)
         req.add_header('Accept', 'application/json')
         req.add_header('Content-Type', 'application/json')
         req.add_header('Accept-Language', 'en')
         req.add_header('Authorization', 'Bearer '+self._authenticationToken["jwtToken"])
         try:
-            response = urllib2.urlopen(req)
+            response = self._http_client.urlopen(req)
             data = json.loads(response.read())
             response.close()
             return data
-        except (urllib2.HTTPError, urllib2.URLError), e:
+        except (self._http_client.HTTPError, self._http_client.URLError), e:
             print('Error: ' + str(e.reason))
             return json.dumps("{}")
