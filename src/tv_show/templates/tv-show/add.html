@@ -1,0 +1,28 @@
+<html>
+
+<head>
+    <title>TV Aficionado</title>
+</head>
+
+<body>
+    <h1>Add TV Shows</h1>
+    <form method="POST" action="">
+        <table id="id_tv_show_info_table">
+            <tr>
+                <td>Name:</td>
+                <td><input name="name" id="id_name" placeholder="Enter the name of a new TV show" /></td>
+            </tr>
+            <tr>
+                <td>Release year:</td>
+                <td><input name="release_year" id="id_year" placeholder="Enter the release year of the new TV show" /></td>
+            <tr>
+                <td>theTVDB id:</td>
+                <td><input name="tvdb_id" id="id_tvdb" placeholder="Enter the unique theTVDB ID of the new TV show" /></td>
+            </tr>
+        </table>
+        <input type="submit" id="id_submit" value="Add">
+        {% csrf_token %}
+    </form>
+</body>
+
+</html>

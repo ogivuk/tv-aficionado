@@ -15,25 +15,85 @@ class VisitorTest(LiveServerTestCase):
         self.browser.quit()
 
     def test_can_open_tvshow_home_page(self):
+        # User opens the landing page for TV Shows
         self.browser.get(self.live_server_url+'/tv-show/')
         header_text = self.browser.find_element_by_tag_name('h1').text
 
+        # User notices TV Aficionado in the page title, and TV Shows in the page.
         self.assertIn('TV Aficionado',self.browser.title)
         self.assertIn('TV Shows', header_text)
 
-# class AddNewTVShowTest(LiveServerTestCase):
+class AddNewTVShowTest(LiveServerTestCase):
 
-#     def setUp(self):
-#         self.browser_firefox = webdriver.Firefox()
-#         self.browser_chrome = webdriver.Chrome()
+    def setUp(self):
+        self.browser = webdriver.Firefox()
 
-#     def tearDown(self):
-#         self.browser_firefox.quit()
-#         self.browser_chrome.quit()
+    def tearDown(self):
+        self.browser.quit()
 
-#     def can_add_tvshow_and_retrieve_it_later(self):
-#         # User opens the default page
+    def test_can_open_home_page_and_go_to_add_new_tvshow_page(self):
+        # User opens the landing page for TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/')
 
+        # User notices a link for adding a new TV Show
+        link = self.browser.find_element_by_id('id_add_tv_show')
+        
+        # The link displays "Add new TV Show"
+        self.assertEqual(link.text,"Add new TV Show")
+        # and it points to ".../tv-show/add/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-show/add/$')
+        
+        # The user clicks on the link to open the page
+        link.click()
+
+        # The browser opens the page
+        self.assertRegex(self.browser.current_url, r'/tv-show/add/$')
+
+    def test_can_add_tvshow_and_retrieve_it_later(self):
+        # User opens the page for adding new TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+
+        # The user is invited to enter the name of a new TV show
+        inputbox = self.browser.find_element_by_id('id_name')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            "Enter the name of a new TV show"
+        )
+        # The user enters "Game of Thrones"
+        inputbox.send_keys('Game of Thrones')
+
+        # The user is invited to enter the release year of a new TV show
+        inputbox = self.browser.find_element_by_id('id_year')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            "Enter the release year of the new TV show"
+        )
+        # The user enters "2011"
+        inputbox.send_keys('2011')
+
+        # The user is invited to enter the theTVDB unique TV show ID
+        inputbox = self.browser.find_element_by_id('id_tvdb')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            "Enter the unique theTVDB ID of the new TV show"
+        )
+        # The user enters "121361"
+        inputbox.send_keys('121361')
+
+        # The user notices the a button named "Add"
+        button = self.browser.find_element_by_id('id_submit')
+        self.assertEqual(
+            button.get_attribute('type'),
+            "submit"
+        )
+        self.assertEqual(
+            button.get_attribute('value'),
+            "Add"
+        )
+        # Finally, the user clicks on the button to add the show
+        button.click()
+        
+        self.fail("Finish the test")
 
 #     def wait_for_row_in_list_table(self, row_text):
 #         start_time = time.time()
