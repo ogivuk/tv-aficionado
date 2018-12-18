@@ -18,5 +18,7 @@
     * On Linux and MacOS, copy the webdriver binary in `/usr/local/bin`.
 
 # TO DO
+* Next: https://www.obeythetestinggoat.com/book/chapter_philosophy_and_refactoring.html
+* Refactor the Learning Notes: Split them into separate files.
 * Make a script to install the requirements
     * Look into the gists for the selenium drivers: https://gist.github.com/cgoldberg/4097efbfeb40adf698a7d05e75e0ff51
