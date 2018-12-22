@@ -50,6 +50,14 @@ class AddNewTVShowTest(LiveServerTestCase):
         self.assertRegex(self.browser.current_url, r'/tv-show/add/$')
 
     def test_can_add_tvshow_and_retrieve_it_later(self):
+        # helper variables holding TV show data
+        test_tvshow_name = 'Game of Thrones'
+        test_tvshow_year = '2011'
+        test_tvshow_thetvdb_id = '121361'
+        test_tvshow_display_name = 'Game of Thrones (2011)'
+        test_tvshow_url_name = 'Game-of-Thrones-2011'
+        test_tvshow_url_id = test_tvshow_thetvdb_id
+        
         # User opens the page for adding new TV Shows
         self.browser.get(self.live_server_url+'/tv-show/add/')
 
@@ -59,8 +67,8 @@ class AddNewTVShowTest(LiveServerTestCase):
             inputbox.get_attribute('placeholder'),
             "Enter the name of a new TV show"
         )
-        # The user enters "Game of Thrones"
-        inputbox.send_keys('Game of Thrones')
+        # The user enters the name of the TV show
+        inputbox.send_keys(test_tvshow_name)
 
         # The user is invited to enter the release year of a new TV show
         inputbox = self.browser.find_element_by_id('id_year')
@@ -68,8 +76,8 @@ class AddNewTVShowTest(LiveServerTestCase):
             inputbox.get_attribute('placeholder'),
             "Enter the release year of the new TV show"
         )
-        # The user enters "2011"
-        inputbox.send_keys('2011')
+        # The user enters the release year
+        inputbox.send_keys(test_tvshow_year)
 
         # The user is invited to enter the theTVDB unique TV show ID
         inputbox = self.browser.find_element_by_id('id_tvdb')
@@ -77,8 +85,8 @@ class AddNewTVShowTest(LiveServerTestCase):
             inputbox.get_attribute('placeholder'),
             "Enter the unique theTVDB ID of the new TV show"
         )
-        # The user enters "121361"
-        inputbox.send_keys('121361')
+        # The user enters the id
+        inputbox.send_keys(test_tvshow_thetvdb_id)
 
         # The user notices the a button named "Add"
         button = self.browser.find_element_by_id('id_submit')
@@ -92,8 +100,42 @@ class AddNewTVShowTest(LiveServerTestCase):
         )
         # Finally, the user clicks on the button to add the show
         button.click()
-        
+
+        # The browser returns to the starting page for TV shows
+        self.assertEqual(self.browser.current_url, self.live_server_url+'/tv-show/')
+
+        # The user sees the name of the TV show in the list
+        table = self.browser.find_element_by_id('id_tvshows_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(test_tvshow_name + ' (' + test_tvshow_year + ')',[row.text for row in rows])
+
+        # The user can access the page for TV show by name
+        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_name}/')
+
+        # The user notices the name of TV show in the page title and in the first <h1> tag
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn(test_tvshow_display_name,self.browser.title)
+        self.assertIn(test_tvshow_display_name, header_text)
+
+        # The user can access the page for TV show by name, where spaces are replaced with hyphens,
+        # appended with release year.
+        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_name}/')
+
+        # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn(test_tvshow_display_name,self.browser.title)
+        self.assertIn(test_tvshow_display_name, header_text)
+
+        self.assertIn(test_tvshow_name, self.browser.toString())
+        self.assertIn(test_tvshow_year, self.browser.toString())
+        self.assertIn(test_tvshow_thetvdb_id, self.browser.toString())
+
+        # The user can access the page for TV show by its id
+
         self.fail("Finish the test")
+
+    # def test_user_cannot_enter_duplicate_tv_show(self):
+
 
 #     def wait_for_row_in_list_table(self, row_text):
 #         start_time = time.time()

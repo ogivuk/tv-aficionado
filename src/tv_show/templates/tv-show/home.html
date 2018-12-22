@@ -6,6 +6,13 @@
 
 <body>
     <h1>TV Shows</h1>
+    <table id="id_tvshows_table">
+        {% for tv_show in tv_shows %}
+        <tr>
+            <td>{{tv_show.name}} ({{tv_show.release_year}})</td>
+        </tr>
+        {% endfor %}
+    </table>
     <a id="id_add_tv_show" href="add/">Add new TV Show</a>
 </body>
 

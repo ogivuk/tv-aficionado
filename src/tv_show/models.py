@@ -1,3 +1,6 @@
 from django.db import models
 
-# Create your models here.
+class TVShow(models.Model):
+    name = models.TextField(default='')
+    release_year = models.IntegerField()
+    tvdb_id = models.IntegerField()

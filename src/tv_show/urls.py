@@ -20,4 +20,5 @@ from tv_show import views
 urlpatterns = [
     path('', views.home_page, name='home_page'),
     path('add/', views.add_tv_show, name="add_tv_show"),
+    path('new', views.new_tv_show, name="new_tv_show"),
 ]
