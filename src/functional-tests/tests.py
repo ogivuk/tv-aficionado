@@ -351,6 +351,51 @@ class ViewTVShowTest(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def test_tvshow_view_displays_all_parameters(self):
+        # First, user adds a TV show
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
+        self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
+        self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
+
+        # The user can access the page for TV show by name, 
+        # where spaces are replaced with hyphens, appended with release year.
+        self.browser.get(self.live_server_url+f'/tv-show/{self.test_tvshow_url_name}/')
+
+        # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        page_text = self.browser.find_element_by_tag_name('body').text
+        
+        self.assertIn(self.test_tvshow_display_name,self.browser.title)
+        self.assertIn(self.test_tvshow_display_name, header_text)
+
+        # The user notices the TV show parameters
+        self.assertIn(self.test_tvshow_name, page_text)
+        self.assertIn(self.test_tvshow_year, page_text)
+        self.assertIn(self.test_tvshow_thetvdb_id, page_text)
+
+        # The user notices the internal ID of the TV Show, and the id is a number larger than 0
+        tvshow_id = self.browser.find_element_by_id('id_tvshow_id').text
+
+        self.assertTrue(int(tvshow_id) > 0)
+
+        # The user can access the page for TV show by its internal ID
+        self.browser.get(self.live_server_url+f'/tv-show/{tvshow_id}/')
+
+        # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        page_text = self.browser.find_element_by_tag_name('body').text
+        
+        self.assertIn(self.test_tvshow_display_name,self.browser.title)
+        self.assertIn(self.test_tvshow_display_name, header_text)
+        
+        # The user notices the TV show parameters
+        self.assertIn(self.test_tvshow_name, page_text)
+        self.assertIn(self.test_tvshow_year, page_text)
+        self.assertIn(self.test_tvshow_thetvdb_id, page_text)
+        self.assertIn(tvshow_id, page_text)
+        
     def test_can_open_tvshow_home_page_from_tvshow_page(self):
         # First, user adds a TV show
         self.browser.get(self.live_server_url+'/tv-show/add/')

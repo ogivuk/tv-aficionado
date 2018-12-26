@@ -126,6 +126,17 @@ class AddTVShowInputValidationTest(TestCase):
         self.assertContains(response, "2018")
 
 class ViewTVShowInfoTest(TestCase):
+    # Helper variables containing TV show info for tests
+    test_tv_show_name = "The First TV Show"
+    test_tv_show_year = 2001
+    test_tv_show_tvdb_id = 123456
+    test_tv_show_display_url = "The-First-TV-Show-2001"
+
+    def are_all_tv_show_info_displayed(self, response, new_tv_show):
+        self.assertContains(response, new_tv_show.id)
+        self.assertContains(response, new_tv_show.name)
+        self.assertContains(response, new_tv_show.release_year)
+        self.assertContains(response, new_tv_show.tvdb_id)
 
     def test_tv_show_view_uses_correct_template(self):
         new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
@@ -135,16 +146,15 @@ class ViewTVShowInfoTest(TestCase):
         self.assertTemplateUsed(response,'tv-show/view.html')
 
     def test_tv_show_info_on_separate_page_based_on_name_and_release_year(self):
-        new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
-        test_url_based_on_name_and_year = new_tv_show.name.replace(' ','-') + '-' + str(new_tv_show.release_year)
+        new_tv_show = TVShow.objects.create(name = self.test_tv_show_name, release_year = self.test_tv_show_year, tvdb_id = self.test_tv_show_tvdb_id)
 
-        response = self.client.get(f'/tv-show/{test_url_based_on_name_and_year}/')
+        response = self.client.get(f'/tv-show/{self.test_tv_show_display_url}/')
 
-        self.assertContains(response, "The First TV Show")
+        self.are_all_tv_show_info_displayed(response, new_tv_show)
 
     def test_tv_show_info_on_separate_page_based_on_id(self):
-        new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
+        new_tv_show = TVShow.objects.create(name = self.test_tv_show_name, release_year = self.test_tv_show_year, tvdb_id = self.test_tv_show_tvdb_id)
 
         response = self.client.get(f'/tv-show/{new_tv_show.id}/')
         
-        self.assertContains(response, "The First TV Show")
+        self.are_all_tv_show_info_displayed(response, new_tv_show)
