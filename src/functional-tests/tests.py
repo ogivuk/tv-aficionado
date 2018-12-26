@@ -21,6 +21,47 @@ class HomePageVisitorTest(LiveServerTestCase):
         self.assertIn('TV Aficionado',self.browser.title)
         self.assertIn('TV Shows', header_text)
 
+    def test_home_page_displays_tv_shows_as_links_to_their_individual_pages(self):
+        # Preparation: User first adds two TV shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys("The First TV Show")
+        self.browser.find_element_by_id('id_year').send_keys("2018")
+        self.browser.find_element_by_id('id_tvdb').send_keys("123456")
+        self.browser.find_element_by_id('id_submit').click()
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys("The Second TV Show")
+        self.browser.find_element_by_id('id_year').send_keys("2018")
+        self.browser.find_element_by_id('id_tvdb').send_keys("123457")
+        self.browser.find_element_by_id('id_submit').click()
+
+        # User opens the landing page for TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/')
+
+        # User sees the list of TV shows
+        table = self.browser.find_element_by_id('id_tvshows_table')
+        rows = table.find_elements_by_tag_name('tr')
+
+        # User sees the first TV show displayed as a Hyperlink
+        link = rows[0].find_element_by_tag_name('a')
+        self.assertRegex(link.get_attribute("href"), r'/tv-show/')
+        self.assertIn(link.text, "The First TV Show (2018)")
+        # User clicks on the link and gets taken to the individual page
+        link.click()
+        self.assertIn("The First TV Show (2018)", self.browser.title)
+
+        # User opens again the landing page for TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/')
+        table = self.browser.find_element_by_id('id_tvshows_table')
+        rows = table.find_elements_by_tag_name('tr')
+
+        # User sees the second TV show displayed as a Hyperlink
+        link = rows[1].find_element_by_tag_name('a')
+        self.assertRegex(link.get_attribute("href"), r'/tv-show/')
+        self.assertIn(link.text, "The Second TV Show (2018)")
+        # User clicks on the link and gets taken to the individual page
+        link.click()
+        self.assertIn("The Second TV Show (2018)", self.browser.title)
+
 class AddNewTVShowTest(LiveServerTestCase):
 
     def setUp(self):

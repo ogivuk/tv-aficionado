@@ -9,7 +9,7 @@
     <table id="id_tvshows_table">
         {% for tv_show in tv_shows %}
         <tr>
-            <td>{{tv_show.name}} ({{tv_show.release_year}})</td>
+            <td><a href="{{tv_show.id}}/">{{tv_show.name}} ({{tv_show.release_year}})</a></td>
         </tr>
         {% endfor %}
     </table>
