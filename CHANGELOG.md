@@ -16,12 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial HTML pages, no CSS or JavaScript.
 - Initial input validation for adding TV shows: check that all parameters are provided.
 - Functional and unit tests.
+- Deployment using Django integrated webserver and SQLite database.
 
 ### Later
 #### Add
 - Edit and remove TV shows.
 - Display all eposides for added TV shows.
+- Import TV shows: from a JSON file, local folder structure.
+- Export TV shows: to a JSON file.
+- Design using Bootstrap.
 - Input validation for adding TV shows: check for allowed characters.
 - Error page when a requested TV show has not been added.
 - Docker support.
 - GitLab CI/CD with Pylint and test coverage.
+- Nginx instead of Django integrated webserver.
+- PostgreSQL instead of SQLite.
