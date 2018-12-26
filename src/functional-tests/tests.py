@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
 import time
 
-class VisitorTest(LiveServerTestCase):
+class HomePageVisitorTest(LiveServerTestCase):
     
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -47,6 +47,22 @@ class AddNewTVShowTest(LiveServerTestCase):
         # The browser opens the page
         self.assertRegex(self.browser.current_url, r'/tv-show/add/$')
 
+    def test_can_open_tvshow_home_page_from_add_tvshow_page(self):
+        # User opens the page for adding TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+
+        # User notices a link for going to the TV Show Home Page
+        link = self.browser.find_element_by_id('id_link_to_home_page')
+
+        # The link points to ".../tv-show/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-show/$')
+
+        # The user clicks on the link to open the page
+        link.click()
+
+        # The browser opens the page
+        self.assertRegex(self.browser.current_url, r'/tv-show/$')
+    
     def test_can_add_tvshow_and_retrieve_it_later(self):
         # helper variables holding TV show data
         test_tvshow_name = 'Game of Thrones'
@@ -217,9 +233,12 @@ class AddNewTVShowTest(LiveServerTestCase):
 class AddNewTVShowValidateInputTest(LiveServerTestCase):
 
     # helper variables holding TV show data
-    test_tvshow_name = 'Game of Thrones'
-    test_tvshow_year = '2011'
-    test_tvshow_thetvdb_id = '121361'
+    test_tvshow_name = 'TV Show 1'
+    test_tvshow_year = '2018'
+    test_tvshow_thetvdb_id = '123456'
+    test_tvshow_display_name = 'TV Show 1 (2018)'
+    test_tvshow_url_name = 'TV-Show-1-2018'
+    test_tvshow_url_id = '1'
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -315,3 +334,42 @@ class AddNewTVShowValidateInputTest(LiveServerTestCase):
         self.browser.get(self.live_server_url+'/tv-show/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
+
+class ViewTVShowTest(LiveServerTestCase):
+
+    # helper variables holding TV show data
+    test_tvshow_name = 'TV Show 1'
+    test_tvshow_year = '2018'
+    test_tvshow_thetvdb_id = '123456'
+    test_tvshow_display_name = 'TV Show 1 (2018)'
+    test_tvshow_url_name = 'TV-Show-1-2018'
+    test_tvshow_url_id = '1'
+
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_open_tvshow_home_page_from_tvshow_page(self):
+        # First, user adds a TV show
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
+        self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
+        self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
+
+        # User opens the page with the TV show information based on its name and year
+        self.browser.get(self.live_server_url+f'/tv-show/{self.test_tvshow_url_name}/')
+
+        # User notices a link for going to the TV Show Home Page
+        link = self.browser.find_element_by_id('id_link_to_home_page')
+
+        # The link points to ".../tv-show/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-show/$')
+
+        # The user clicks on the link to open the page
+        link.click()
+
+        # The browser opens the page
+        self.assertRegex(self.browser.current_url, r'/tv-show/$')
