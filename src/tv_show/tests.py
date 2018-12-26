@@ -2,8 +2,6 @@ from django.test import TestCase
 
 from tv_show.models import TVShow
 
-# Create your tests here.
-
 class HomePageVisitorTest(TestCase):
 
     def test_uses_home_template(self):
@@ -51,12 +49,12 @@ class TVShowModelTest(TestCase):
 
 class AddNewTVShowTest(TestCase):
 
-    def test_uses_correct_template(self):
+    def test_tv_show_add_uses_correct_template(self):
         response = self.client.get('/tv-show/add/')
         
         self.assertTemplateUsed(response,'tv-show/add.html')
 
-    def test_can_save_a_POST_request(self):
+    def test_tv_show_add_can_save_a_POST_request(self):
         self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': 2018, 'tvdb_id': 123456})
 
         self.assertEqual(TVShow.objects.count(), 1)
@@ -68,10 +66,85 @@ class AddNewTVShowTest(TestCase):
     def test_redirect_after_post(self):
         response = self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': 2018, 'tvdb_id': 123456})
 
-        new_tvshow = TVShow.objects.first()
-        self.assertRedirects(response, '/tv-show/')
+        self.assertRedirects(response, '/tv-show/add/?name=TV-Show-1&release_year=2018&tvdb_id=123456&status=add-success')
+
+    def test_tv_show_add_can_display_status_message(self):
+        response = self.client.get('/tv-show/add/?name=TV-Show-1&release_year=2018&tvdb_id=123456&status=add-success')
+        
+        self.assertContains(response, "TV Show 1 (2018) has been successfully added.")
+
+    def test_tv_show_add_does_not_display_parameters_when_successful(self):
+        response = self.client.get('/tv-show/add/?name=TV-Show-1&release_year=2018&tvdb_id=123456&status=add-success')
+        
+        self.assertNotContains(response, "123456")
 
 class AddTVShowInputValidationTest(TestCase):
 
-    def test_must_have_all_fields_filled_in(self):
-        pass
+    def test_post_does_not_save_new_tv_show_without_name_filled_in(self):
+        self.client.post('/tv-show/new', data={'name': '', 'release_year': '2018', 'tvdb_id': '123456'})
+
+        self.assertEqual(TVShow.objects.count(), 0)
+
+    def test_post_does_not_save_new_tv_show_without_release_year_filled_in(self):
+        self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': '', 'tvdb_id': '123456'})
+        
+        self.assertEqual(TVShow.objects.count(), 0)
+
+    def test_post_does_not_save_new_tv_show_without_tvdb_id_filled_in(self):
+        self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': '2018', 'tvdb_id': ''})
+
+        self.assertEqual(TVShow.objects.count(), 0)
+
+    def test_post_does_not_save_new_tv_show_with_already_existing_name_and_release_year(self):
+        self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': '2018', 'tvdb_id': '123456'})
+        self.assertEqual(TVShow.objects.count(), 1)
+        
+        self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': '2018', 'tvdb_id': '123456'})
+        self.assertEqual(TVShow.objects.count(), 1)
+
+    def test_tv_show_add_does_not_display_parameters_when_duplicate(self):
+        response = self.client.get('/tv-show/add/?name=TV-Show-1&release_year=2018&tvdb_id=123456&status=add-fail-tv-show-exists')
+        
+        self.assertNotContains(response, "123456")
+
+    def test_tv_show_add_displays_parameters_when_missing_name(self):
+        response = self.client.get('/tv-show/add/?name=&release_year=2018&tvdb_id=123456&status=add-fail-missing-name')
+        
+        self.assertContains(response, "2018")
+        self.assertContains(response, "123456")
+
+    def test_tv_show_add_displays_parameters_when_missing_release_year(self):
+        response = self.client.get('/tv-show/add/?name=TV-Show-1&release_year=&tvdb_id=123456&status=add-fail-missing-year')
+        
+        self.assertContains(response, "TV Show 1")
+        self.assertContains(response, "123456")
+
+    def test_tv_show_add_displays_parameters_when_missing_tvdb_id(self):
+        response = self.client.get('/tv-show/add/?name=TV-Show-1&release_year=2018&tvdb_id=&status=add-fail-missing-tvdb-id')
+        
+        self.assertContains(response, "TV Show 1")
+        self.assertContains(response, "2018")
+
+class ViewTVShowInfoTest(TestCase):
+
+    def test_tv_show_view_uses_correct_template(self):
+        new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
+
+        response = self.client.get(f'/tv-show/{new_tv_show.id}/')
+        
+        self.assertTemplateUsed(response,'tv-show/view.html')
+
+    def test_tv_show_info_on_separate_page_based_on_name_and_release_year(self):
+        new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
+        test_url_based_on_name_and_year = new_tv_show.name.replace(' ','-') + '-' + str(new_tv_show.release_year)
+
+        response = self.client.get(f'/tv-show/{test_url_based_on_name_and_year}/')
+
+        self.assertContains(response, "The First TV Show")
+
+    def test_tv_show_info_on_separate_page_based_on_id(self):
+        new_tv_show = TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
+
+        response = self.client.get(f'/tv-show/{new_tv_show.id}/')
+        
+        self.assertContains(response, "The First TV Show")

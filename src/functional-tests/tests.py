@@ -4,8 +4,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
 import time
 
-MAX_WAIT = 10
-
 class VisitorTest(LiveServerTestCase):
     
     def setUp(self):
@@ -56,7 +54,7 @@ class AddNewTVShowTest(LiveServerTestCase):
         test_tvshow_thetvdb_id = '121361'
         test_tvshow_display_name = 'Game of Thrones (2011)'
         test_tvshow_url_name = 'Game-of-Thrones-2011'
-        test_tvshow_url_id = test_tvshow_thetvdb_id
+        test_tvshow_url_id = '1' # Internal IDs always start from 1
         
         # User opens the page for adding new TV Shows
         self.browser.get(self.live_server_url+'/tv-show/add/')
@@ -101,21 +99,36 @@ class AddNewTVShowTest(LiveServerTestCase):
         # Finally, the user clicks on the button to add the show
         button.click()
 
-        # The browser returns to the starting page for TV shows
-        self.assertEqual(self.browser.current_url, self.live_server_url+'/tv-show/')
+        # The browser returns to page with adding new TV shows carrying over the data
+        test_tvshow_urlarg_name = test_tvshow_name.replace(' ','-')
+        self.assertEqual(
+            self.browser.current_url, 
+            self.live_server_url + '/tv-show/add/' 
+                + f'?name={test_tvshow_urlarg_name}'
+                + f'&release_year={test_tvshow_year}'
+                + f'&tvdb_id={test_tvshow_thetvdb_id}'
+                + '&status=add-success'
+        )
+
+        # The user observes that the entered values have not been kept
+        inputbox = self.browser.find_element_by_id('id_name')
+        self.assertEqual(inputbox.get_attribute('value'), '')
+        inputbox = self.browser.find_element_by_id('id_year')
+        self.assertEqual(inputbox.get_attribute('value'), '')
+        inputbox = self.browser.find_element_by_id('id_tvdb')
+        self.assertEqual(inputbox.get_attribute('value'), '')
+
+        # The user observes the message that the TV show has been successfully added
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, test_tvshow_display_name + " has been successfully added.")
+
+        # The user opens the page with all TV shows
+        self.browser.get(self.live_server_url+'/tv-show/')
 
         # The user sees the name of the TV show in the list
         table = self.browser.find_element_by_id('id_tvshows_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(test_tvshow_name + ' (' + test_tvshow_year + ')',[row.text for row in rows])
-
-        # The user can access the page for TV show by name
-        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_name}/')
-
-        # The user notices the name of TV show in the page title and in the first <h1> tag
-        header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn(test_tvshow_display_name,self.browser.title)
-        self.assertIn(test_tvshow_display_name, header_text)
 
         # The user can access the page for TV show by name, where spaces are replaced with hyphens,
         # appended with release year.
@@ -123,104 +136,182 @@ class AddNewTVShowTest(LiveServerTestCase):
 
         # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
         header_text = self.browser.find_element_by_tag_name('h1').text
+        page_text = self.browser.find_element_by_tag_name('body').text
+        
         self.assertIn(test_tvshow_display_name,self.browser.title)
         self.assertIn(test_tvshow_display_name, header_text)
-
-        self.assertIn(test_tvshow_name, self.browser.toString())
-        self.assertIn(test_tvshow_year, self.browser.toString())
-        self.assertIn(test_tvshow_thetvdb_id, self.browser.toString())
+        self.assertIn(test_tvshow_name, page_text)
+        self.assertIn(test_tvshow_year, page_text)
+        self.assertIn(test_tvshow_thetvdb_id, page_text)
 
         # The user can access the page for TV show by its id
+        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_id}/')
 
-        self.fail("Finish the test")
+        # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        page_text = self.browser.find_element_by_tag_name('body').text
+        
+        self.assertIn(test_tvshow_display_name,self.browser.title)
+        self.assertIn(test_tvshow_display_name, header_text)
+        self.assertIn(test_tvshow_name, page_text)
+        self.assertIn(test_tvshow_year, page_text)
+        self.assertIn(test_tvshow_thetvdb_id, page_text)
 
-    # def test_user_cannot_enter_duplicate_tv_show(self):
+    def test_user_cannot_enter_duplicate_tv_show(self):
+        # helper variables holding TV show data
+        test_tvshow_name = 'Game of Thrones'
+        test_tvshow_year = '2011'
+        test_tvshow_thetvdb_id = '121361'
+        test_tvshow_display_name = 'Game of Thrones (2011)'
+        test_tvshow_url_name = 'Game-of-Thrones-2011'
+        test_tvshow_url_id = '1'
+        
+        # User opens the page with all TV shows
+        self.browser.get(self.live_server_url+'/tv-show/')
 
+        # User does not see the new TV show in the list yet
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(test_tvshow_name, page_text)
 
-#     def wait_for_row_in_list_table(self, row_text):
-#         start_time = time.time()
-#         while True:
-#             try:
-#                 table = self.browser.find_element_by_id('id_list_table')
-#                 rows = table.find_elements_by_tag_name('tr')
-#                 self.assertIn(row_text,[row.text for row in rows])
-#                 return
-#             except (AssertionError, WebDriverException) as e:
-#                 if time.time() - start_time > MAX_WAIT:
-#                     raise e
-#                 time.sleep(0.5)      
+        # User opens the page for adding new TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
 
-#     def test_can_add_players_and_retrieve_them_later(self):
-#         # Foosball local admin opens the web app
-#         self.browser.get(self.live_server_url)
+        # The user enters the new TV show for the first time
+        self.browser.find_element_by_id('id_name').send_keys(test_tvshow_name)
+        self.browser.find_element_by_id('id_year').send_keys(test_tvshow_year)
+        self.browser.find_element_by_id('id_tvdb').send_keys(test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
 
-#         # (S)he notices the name T.G.I.Foosball in the title and the first header
-#         self.assertIn('T.G.I.Foosball', self.browser.title)
-#         header_text = self.browser.find_element_by_tag_name('h1').text
-#         self.assertIn('Tournament', header_text)
+        # The user observes the message that the TV show has been successfully added
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, test_tvshow_display_name + " has been successfully added.")
+        
+        # The user goes back to the starting page for TV shows
+        self.browser.get(self.live_server_url+'/tv-show/')
 
-#         # The admin is invited to enter a new player
-#         inputbox = self.browser.find_element_by_id('id_new_item')
-#         self.assertEqual(
-#             inputbox.get_attribute('placeholder'),
-#             "Enter a new player name"
-#         )
+        # The user sees the new TV show in the list
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertIn(test_tvshow_name, page_text)
 
-#         # The admin types "John Doe" into a text box
-#         inputbox.send_keys('John Doe')
+        # The user opens the page for adding new TV Shows for 2nd time
+        self.browser.get(self.live_server_url+'/tv-show/add/')
 
-#         # When the admin hits enter, the page updates, and now the page lists
-#         # "1: John Doe" as a player in the list of players:
-#         inputbox.send_keys(Keys.ENTER)
-#         self.wait_for_row_in_list_table('1: John Doe')
+        # The user tries to enter the new TV show for the second time
+        self.browser.find_element_by_id('id_name').send_keys(test_tvshow_name)
+        self.browser.find_element_by_id('id_year').send_keys(test_tvshow_year)
+        self.browser.find_element_by_id('id_tvdb').send_keys(test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
 
-#         # There is still a text box inviting the admin to add another player.
-#         # The admin enters "Jenny Doe":
-#         inputbox = self.browser.find_element_by_id('id_new_item')
-#         inputbox.send_keys('Jenny Doe')
-#         inputbox.send_keys(Keys.ENTER)
+        # The user observes the message that the TV show already exists
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, test_tvshow_display_name + " already exists.")
 
-#         # The page updates again, and now shows both players in the list:
-#         self.wait_for_row_in_list_table('1: John Doe')
-#         self.wait_for_row_in_list_table('2: Jenny Doe')
+        # The user observes that the values have not been kept
+        inputbox = self.browser.find_element_by_id('id_name')
+        self.assertEqual(inputbox.get_attribute('value'), '')
+        inputbox = self.browser.find_element_by_id('id_year')
+        self.assertEqual(inputbox.get_attribute('value'), '')
+        inputbox = self.browser.find_element_by_id('id_tvdb')
+        self.assertEqual(inputbox.get_attribute('value'), '')
 
-#     def test_multiple_tournaments_have_user_lists_at_different_urls(self):
-#         # Thomas creates a new tournament
-#         self.browser.get(self.live_server_url)
-#         inputbox = self.browser.find_element_by_id('id_new_item')
-#         inputbox.send_keys("John Doe")
-#         inputbox.send_keys(Keys.ENTER)
-#         self.wait_for_row_in_list_table("1: John Doe")
+class AddNewTVShowValidateInputTest(LiveServerTestCase):
 
-#         # He notices that the tournament has a unique URL
-#         thomas_tournament_url = self.browser.current_url
-#         self.assertRegex(thomas_tournament_url, '/tournament/.+')
+    # helper variables holding TV show data
+    test_tvshow_name = 'Game of Thrones'
+    test_tvshow_year = '2011'
+    test_tvshow_thetvdb_id = '121361'
 
-#         # Now, another admin, Ognjen, wants to create another tournament
+    def setUp(self):
+        self.browser = webdriver.Firefox()
 
-#         ## We use a new browser session to make sure that no information
-#         ## of Thomas is coming through from cookies, etc.
-#         self.browser.quit()
-#         self.browser = webdriver.Firefox()
+    def tearDown(self):
+        self.browser.quit()
 
-#         # Ognjen visits the main page. There is no sign of Thomas' tournament
-#         self.browser.get(self.live_server_url)
-#         page_text = self.browser.find_element_by_tag_name('body').text
-#         self.assertNotIn('John Doe', page_text)
-#         self.assertNotIn('Jenny Doe', page_text)
+    def test_input_validation_user_cannot_save_TVshow_without_name(self):
+        # User opens the page with all TV shows, and it does not see the new TV show
+        self.browser.get(self.live_server_url+'/tv-show/')
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
 
-#         # Ognjen creates a new tournament
-#         inputbox = self.browser.find_element_by_id('id_new_item')
-#         inputbox.send_keys('Jenny Doe')
-#         inputbox.send_keys(Keys.ENTER)
-#         self.wait_for_row_in_list_table("1: Jenny Doe")
+        # User opens the page for adding new TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
 
-#         # Ognjen gets his own URL for the tournament
-#         ognjen_tournament_url = self.browser.current_url
-#         self.assertRegex(ognjen_tournament_url, "/tournament/.+")
-#         self.assertNotEqual(thomas_tournament_url, ognjen_tournament_url)
+        # The user enters the new TV show, but without its name
+        self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
+        self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
 
-#         # Again, there is no trace of Thomas' tournament
-#         page_text = self.browser.find_element_by_tag_name('body').text
-#         self.assertNotIn("John Doe", page_text)
-#         self.assertIn("Jenny Doe", page_text)
+        # The user observes the message to enter the name of the TV show
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, "Please enter the name of the TV show.")
+
+        # The user observes that the other values have been kept
+        inputbox = self.browser.find_element_by_id('id_year')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_year)
+        inputbox = self.browser.find_element_by_id('id_tvdb')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_thetvdb_id)
+
+        # User opens the page with all TV shows, and it still does not see the new TV show
+        self.browser.get(self.live_server_url+'/tv-show/')
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
+
+    def test_input_validation_user_cannot_save_TVshow_without_release_year(self):
+        # User opens the page with all TV shows, and it does not see the new TV show
+        self.browser.get(self.live_server_url+'/tv-show/')
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
+
+        # User opens the page for adding new TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+
+        # The user enters the new TV show, but without its release year
+        self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
+        self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
+        self.browser.find_element_by_id('id_submit').click()
+
+        # The user observes the message to enter the release year of the TV show
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, "Please enter the release year of the TV show.")
+
+        # The user observes that the other values have been kept
+        inputbox = self.browser.find_element_by_id('id_name')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_name)
+        inputbox = self.browser.find_element_by_id('id_tvdb')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_thetvdb_id)
+
+        # User opens the page with all TV shows, and it still does not see the new TV show
+        self.browser.get(self.live_server_url+'/tv-show/')
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
+    
+    def test_input_validation_user_cannot_save_TVshow_without_tvdb_id(self):
+        # User opens the page with all TV shows
+        self.browser.get(self.live_server_url+'/tv-show/')
+
+        # User does not see the new TV show in the list yet
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
+
+        # User opens the page for adding new TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+
+        # The user enters the new TV show for the first time, but without its tvdb id
+        self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
+        self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
+        self.browser.find_element_by_id('id_submit').click()
+
+        # The user observes the message to enter the TVDB id of the TV show
+        messagebox = self.browser.find_element_by_id('id_status_message')
+        self.assertEqual(messagebox.text, "Please enter the TVDB id of the TV show.")
+
+        # The user observes that the other values have been kept
+        inputbox = self.browser.find_element_by_id('id_name')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_name)
+        inputbox = self.browser.find_element_by_id('id_year')
+        self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_year)
+
+        # User opens the page with all TV shows, and it still does not see the new TV show
+        self.browser.get(self.live_server_url+'/tv-show/')
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(self.test_tvshow_name, page_text)
