@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Later
 #### Add
 - Edit and remove TV shows.
+- Search assist for theTVDB id when adding a new TV show.
 - Display all eposides for added TV shows.
 - Import TV shows: from a JSON file, local folder structure.
 - Export TV shows: to a JSON file.
