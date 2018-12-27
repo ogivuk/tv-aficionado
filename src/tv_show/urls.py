@@ -23,4 +23,5 @@ urlpatterns = [
     path('new', views.new_tv_show, name="new_tv_show"),
     path('<int:tv_show_id>/', views.view_tv_show, name='view_tv_show'),
     path('<str:tv_show_name_year>/', views.view_tv_show_name_year, name='view_tv_show_name_year'),
+    path('all/update', views.update_all_tv_shows, name='update_all_tv_shows'),
 ]

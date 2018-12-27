@@ -42,7 +42,8 @@ class HomePageVisitorTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
 
         # User sees the first TV show displayed as a Hyperlink
-        link = rows[0].find_element_by_tag_name('a')
+        ## rows[1] contains the first TV show entry, rows[0] has the table header
+        link = rows[1].find_element_by_tag_name('a')
         self.assertRegex(link.get_attribute("href"), r'/tv-show/')
         self.assertIn(link.text, "The First TV Show (2018)")
         # User clicks on the link and gets taken to the individual page
@@ -55,12 +56,84 @@ class HomePageVisitorTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
 
         # User sees the second TV show displayed as a Hyperlink
-        link = rows[1].find_element_by_tag_name('a')
+        link = rows[2].find_element_by_tag_name('a')
         self.assertRegex(link.get_attribute("href"), r'/tv-show/')
         self.assertIn(link.text, "The Second TV Show (2018)")
         # User clicks on the link and gets taken to the individual page
         link.click()
         self.assertIn("The Second TV Show (2018)", self.browser.title)
+
+    def test_home_page_can_update_episode_information_for_all_tv_shows(self):
+        # Preparation: User first adds two TV shows
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys("The First TV Show")
+        self.browser.find_element_by_id('id_year').send_keys("2018")
+        self.browser.find_element_by_id('id_tvdb').send_keys("123456")
+        self.browser.find_element_by_id('id_submit').click()
+        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.find_element_by_id('id_name').send_keys("The Second TV Show")
+        self.browser.find_element_by_id('id_year').send_keys("2018")
+        self.browser.find_element_by_id('id_tvdb').send_keys("123457")
+        self.browser.find_element_by_id('id_submit').click()
+        
+        # User opens the landing page for TV Shows
+        self.browser.get(self.live_server_url+'/tv-show/')
+
+        # User sees the TV shows, but with no information about the episodes
+        table = self.browser.find_element_by_id('id_tvshows_table')
+        rows = table.find_elements_by_tag_name('tr')
+        tv_show_1_attributes = rows[1].find_elements_by_tag_name('td')
+        tv_show_2_attributes = rows[2].find_elements_by_tag_name('td')
+
+        self.assertEqual(tv_show_1_attributes[0].text, "The First TV Show (2018)")
+        self.assertEqual(tv_show_1_attributes[1].text, "")
+        self.assertEqual(tv_show_1_attributes[2].text, "")
+        self.assertEqual(tv_show_1_attributes[3].text, "")
+        self.assertEqual(tv_show_1_attributes[4].text, "")
+
+        self.assertEqual(tv_show_2_attributes[0].text, "The Second TV Show (2018)")
+        self.assertEqual(tv_show_2_attributes[1].text, "")
+        self.assertEqual(tv_show_2_attributes[2].text, "")
+        self.assertEqual(tv_show_2_attributes[3].text, "")
+        self.assertEqual(tv_show_2_attributes[4].text, "")
+        #self.assertIn(link.text, "The First TV Show (2018)")
+
+        # User notices the a button named "Update All"
+        button = self.browser.find_element_by_id('id_update_all')
+        self.assertEqual(
+            button.get_attribute('type'),
+            "submit"
+        )
+        self.assertEqual(
+            button.get_attribute('value'),
+            "Update All"
+        )
+        # Finally, the user clicks on the button to add the show
+        button.click()
+
+        # The browser returns to the home page
+        self.assertEqual(
+            self.browser.current_url, 
+            self.live_server_url + '/tv-show/'
+        )
+
+        # User sees the TV shows with updated information
+        table = self.browser.find_element_by_id('id_tvshows_table')
+        rows = table.find_elements_by_tag_name('tr')
+        tv_show_1_attributes = rows[1].find_elements_by_tag_name('td')
+        tv_show_2_attributes = rows[2].find_elements_by_tag_name('td')
+
+        self.assertEqual(tv_show_1_attributes[0].text, "The First TV Show (2018)")
+        self.assertNotEqual(tv_show_1_attributes[1].text, "")
+        self.assertNotEqual(tv_show_1_attributes[2].text, "")
+        self.assertNotEqual(tv_show_1_attributes[3].text, "")
+        self.assertNotEqual(tv_show_1_attributes[4].text, "")
+
+        self.assertEqual(tv_show_2_attributes[0].text, "The Second TV Show (2018)")
+        self.assertNotEqual(tv_show_2_attributes[1].text, "")
+        self.assertNotEqual(tv_show_2_attributes[2].text, "")
+        self.assertNotEqual(tv_show_2_attributes[3].text, "")
+        self.assertNotEqual(tv_show_2_attributes[4].text, "")
 
 class AddNewTVShowTest(LiveServerTestCase):
 

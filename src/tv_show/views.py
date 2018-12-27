@@ -95,3 +95,5 @@ def view_tv_show_name_year(request, tv_show_name_year):
 
     return view_tv_show(request, tv_show.id)
     
+def update_all_tv_shows(request):
+    return redirect('/tv-show/')

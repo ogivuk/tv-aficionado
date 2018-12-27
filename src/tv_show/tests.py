@@ -7,7 +7,7 @@ class HomePageVisitorTest(TestCase):
     def test_uses_home_template(self):
         response = self.client.get('/tv-show/')
         
-        self.assertTemplateUsed(response,'tv-show/home.html')
+        self.assertTemplateUsed(response, 'tv-show/home.html')
     
     def test_displays_tv_shows(self):
         TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
@@ -17,6 +17,17 @@ class HomePageVisitorTest(TestCase):
 
         self.assertContains(response, "The First TV Show")
         self.assertContains(response, "The Second TV Show")
+
+    def test_update_all_tv_shows(self):
+        TVShow.objects.create(name = "The First TV Show", release_year = 2001, tvdb_id = 123456)
+        TVShow.objects.create(name = "The Second TV Show", release_year = 2002, tvdb_id = 123457)
+
+        self.fail("Finish the test")
+    
+    def test_redirect_after_post(self):
+        response = self.client.post('/tv-show/all/update')
+
+        self.assertRedirects(response, '/tv-show/')
 
 class TVShowModelTest(TestCase):
 
@@ -52,7 +63,7 @@ class AddNewTVShowTest(TestCase):
     def test_tv_show_add_uses_correct_template(self):
         response = self.client.get('/tv-show/add/')
         
-        self.assertTemplateUsed(response,'tv-show/add.html')
+        self.assertTemplateUsed(response, 'tv-show/add.html')
 
     def test_tv_show_add_can_save_a_POST_request(self):
         self.client.post('/tv-show/new', data={'name': 'TV Show 1', 'release_year': 2018, 'tvdb_id': 123456})

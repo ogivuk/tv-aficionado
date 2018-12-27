@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -7,12 +8,27 @@
 <body>
     <h1>TV Shows</h1>
     <table id="id_tvshows_table">
+        <tr>
+            <td>TV Show</td>
+            <td>Last Episode Number</td>
+            <td>Last Episode Air Date</td>
+            <td>Next Episode Number</td>
+            <td>Next Episode Air Date</td>
+        </tr>
         {% for tv_show in tv_shows %}
         <tr>
             <td><a href="{{tv_show.id}}/">{{tv_show.name}} ({{tv_show.release_year}})</a></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         {% endfor %}
     </table>
+    <form method="POST" action="all/update">
+        <input type="submit" id="id_update_all" value="Update All">
+        {% csrf_token %}
+    </form>
     <a id="id_add_tv_show" href="add/">Add new TV Show</a>
 </body>
 
