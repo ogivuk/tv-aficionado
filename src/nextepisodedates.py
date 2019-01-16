@@ -52,6 +52,7 @@ tvSeriesNamesAndIDs = {
     "New Girl (2011-2018)" : 248682,
     "Norsemen (2016)" : 318009,
     "Outlander (2014)" : 270408,
+    "Ozark (2017)" : 329089,
     "Peaky Blinders (2013)" : 270915,
     "Sherlock (2010)" : 176941,
     "Silicon Valley (2014)" : 277165,
