@@ -21,7 +21,7 @@ class HomePageVisitorTest(LiveServerTestCase):
         self.assertIn('TV Aficionado',self.browser.title)
         self.assertIn('TV Series', header_text)
 
-    def test_home_page_displays_tv_shows_as_links_to_their_individual_pages(self):
+    def test_home_page_displays_tv_series_as_links_to_their_individual_pages(self):
         # Preparation: User first adds two TV Series
         self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The First TV Series")
@@ -63,7 +63,7 @@ class HomePageVisitorTest(LiveServerTestCase):
         link.click()
         self.assertIn("The Second TV Series (2018)", self.browser.title)
 
-    def test_home_page_can_update_episode_information_for_all_tv_shows(self):
+    def test_home_page_can_update_episode_information_for_all_tv_series(self):
         # Preparation: User first adds two TV Series
         self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The First TV Series")
@@ -82,20 +82,20 @@ class HomePageVisitorTest(LiveServerTestCase):
         # User sees the TV Series, but with no information about the episodes
         table = self.browser.find_element_by_id('id_tvseries_table')
         rows = table.find_elements_by_tag_name('tr')
-        tv_show_1_attributes = rows[1].find_elements_by_tag_name('td')
-        tv_show_2_attributes = rows[2].find_elements_by_tag_name('td')
+        tv_series_1_attributes = rows[1].find_elements_by_tag_name('td')
+        tv_series_2_attributes = rows[2].find_elements_by_tag_name('td')
 
-        self.assertEqual(tv_show_1_attributes[0].text, "The First TV Series (2018)")
-        self.assertEqual(tv_show_1_attributes[1].text, "")
-        self.assertEqual(tv_show_1_attributes[2].text, "")
-        self.assertEqual(tv_show_1_attributes[3].text, "")
-        self.assertEqual(tv_show_1_attributes[4].text, "")
+        self.assertEqual(tv_series_1_attributes[0].text, "The First TV Series (2018)")
+        self.assertEqual(tv_series_1_attributes[1].text, "")
+        self.assertEqual(tv_series_1_attributes[2].text, "")
+        self.assertEqual(tv_series_1_attributes[3].text, "")
+        self.assertEqual(tv_series_1_attributes[4].text, "")
 
-        self.assertEqual(tv_show_2_attributes[0].text, "The Second TV Series (2018)")
-        self.assertEqual(tv_show_2_attributes[1].text, "")
-        self.assertEqual(tv_show_2_attributes[2].text, "")
-        self.assertEqual(tv_show_2_attributes[3].text, "")
-        self.assertEqual(tv_show_2_attributes[4].text, "")
+        self.assertEqual(tv_series_2_attributes[0].text, "The Second TV Series (2018)")
+        self.assertEqual(tv_series_2_attributes[1].text, "")
+        self.assertEqual(tv_series_2_attributes[2].text, "")
+        self.assertEqual(tv_series_2_attributes[3].text, "")
+        self.assertEqual(tv_series_2_attributes[4].text, "")
         #self.assertIn(link.text, "The First TV Series (2018)")
 
         # User notices the a button named "Update All"
@@ -108,7 +108,7 @@ class HomePageVisitorTest(LiveServerTestCase):
             button.get_attribute('value'),
             "Update All"
         )
-        # Finally, the user clicks on the button to add the show
+        # Finally, the user clicks on the button to add the TV series
         button.click()
 
         # The browser returns to the home page
@@ -120,20 +120,20 @@ class HomePageVisitorTest(LiveServerTestCase):
         # User sees the TV Series with updated information
         table = self.browser.find_element_by_id('id_tvseries_table')
         rows = table.find_elements_by_tag_name('tr')
-        tv_show_1_attributes = rows[1].find_elements_by_tag_name('td')
-        tv_show_2_attributes = rows[2].find_elements_by_tag_name('td')
+        tv_series_1_attributes = rows[1].find_elements_by_tag_name('td')
+        tv_series_2_attributes = rows[2].find_elements_by_tag_name('td')
 
-        self.assertEqual(tv_show_1_attributes[0].text, "The First TV Series (2018)")
-        self.assertNotEqual(tv_show_1_attributes[1].text, "")
-        self.assertNotEqual(tv_show_1_attributes[2].text, "")
-        self.assertNotEqual(tv_show_1_attributes[3].text, "")
-        self.assertNotEqual(tv_show_1_attributes[4].text, "")
+        self.assertEqual(tv_series_1_attributes[0].text, "The First TV Series (2018)")
+        self.assertNotEqual(tv_series_1_attributes[1].text, "")
+        self.assertNotEqual(tv_series_1_attributes[2].text, "")
+        self.assertNotEqual(tv_series_1_attributes[3].text, "")
+        self.assertNotEqual(tv_series_1_attributes[4].text, "")
 
-        self.assertEqual(tv_show_2_attributes[0].text, "The Second TV Series (2018)")
-        self.assertNotEqual(tv_show_2_attributes[1].text, "")
-        self.assertNotEqual(tv_show_2_attributes[2].text, "")
-        self.assertNotEqual(tv_show_2_attributes[3].text, "")
-        self.assertNotEqual(tv_show_2_attributes[4].text, "")
+        self.assertEqual(tv_series_2_attributes[0].text, "The Second TV Series (2018)")
+        self.assertNotEqual(tv_series_2_attributes[1].text, "")
+        self.assertNotEqual(tv_series_2_attributes[2].text, "")
+        self.assertNotEqual(tv_series_2_attributes[3].text, "")
+        self.assertNotEqual(tv_series_2_attributes[4].text, "")
 
 class AddNewTVSeriesTest(LiveServerTestCase):
 
@@ -148,7 +148,7 @@ class AddNewTVSeriesTest(LiveServerTestCase):
         self.browser.get(self.live_server_url+'/tv-series/')
 
         # User notices a link for adding a new TV Series
-        link = self.browser.find_element_by_id('id_add_tv_show')
+        link = self.browser.find_element_by_id('id_add_tv_series')
         
         # The link displays "Add new TV Series"
         self.assertEqual(link.text,"Add new TV Series")
@@ -226,7 +226,7 @@ class AddNewTVSeriesTest(LiveServerTestCase):
             button.get_attribute('value'),
             "Add"
         )
-        # Finally, the user clicks on the button to add the show
+        # Finally, the user clicks on the button to add the TV series
         button.click()
 
         # The browser returns to page with adding new TV Series carrying over the data
@@ -287,14 +287,12 @@ class AddNewTVSeriesTest(LiveServerTestCase):
         self.assertIn(test_tvseries_year, page_text)
         self.assertIn(test_tvseries_thetvdb_id, page_text)
 
-    def test_user_cannot_enter_duplicate_tv_show(self):
+    def test_user_cannot_enter_duplicate_tv_series(self):
         # helper variables holding TV Series data
         test_tvseries_name = 'Game of Thrones'
         test_tvseries_year = '2011'
         test_tvseries_thetvdb_id = '121361'
         test_tvseries_display_name = 'Game of Thrones (2011)'
-        test_tvseries_url_name = 'Game-of-Thrones-2011'
-        test_tvseries_url_id = '1'
         
         # User opens the page with all TV Series
         self.browser.get(self.live_server_url+'/tv-series/')
@@ -344,14 +342,14 @@ class AddNewTVSeriesTest(LiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_tvdb')
         self.assertEqual(inputbox.get_attribute('value'), '')
 
-class AddNewTVSeriesShowValidateInputTest(LiveServerTestCase):
+class AddNewTVSeriesValidateInputTest(LiveServerTestCase):
 
     # helper variables holding TV Series data
     test_tvseries_name = 'TV Series 1'
     test_tvseries_year = '2018'
     test_tvseries_thetvdb_id = '123456'
     test_tvseries_display_name = 'TV Series 1 (2018)'
-    test_tvseries_url_name = 'TV-Show-1-2018'
+    test_tvseries_url_name = 'TV-Series-1-2018'
     test_tvseries_url_id = '1'
 
     def setUp(self):
@@ -456,7 +454,7 @@ class ViewTVseriesTest(LiveServerTestCase):
     test_tvseries_year = '2018'
     test_tvseries_thetvdb_id = '123456'
     test_tvseries_display_name = 'TV Series 1 (2018)'
-    test_tvseries_url_name = 'TV-Show-1-2018'
+    test_tvseries_url_name = 'TV-Series-1-2018'
     test_tvseries_url_id = '1'
 
     def setUp(self):
