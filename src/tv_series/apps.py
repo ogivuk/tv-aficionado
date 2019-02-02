@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class TvShowConfig(AppConfig):
-    name = 'tv_show'
+class TvSeriesConfig(AppConfig):
+    name = 'tv_series'

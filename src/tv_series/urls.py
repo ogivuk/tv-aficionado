@@ -1,4 +1,4 @@
-"""tv_show URL Configuration
+"""tv_series URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.1/topics/http/urls/
@@ -15,13 +15,13 @@ Including another URLconf
 """
 from django.urls import path
 
-from tv_show import views
+from tv_series import views
 
 urlpatterns = [
     path('', views.home_page, name='home_page'),
-    path('add/', views.add_tv_show, name="add_tv_show"),
-    path('new', views.new_tv_show, name="new_tv_show"),
-    path('<int:tv_show_id>/', views.view_tv_show, name='view_tv_show'),
-    path('<str:tv_show_name_year>/', views.view_tv_show_name_year, name='view_tv_show_name_year'),
-    path('all/update', views.update_all_tv_shows, name='update_all_tv_shows'),
+    path('add/', views.add_tv_series, name="add_tv_series"),
+    path('new', views.new_tv_series, name="new_tv_series"),
+    path('<int:tv_series_id>/', views.view_tv_series, name='view_tv_series'),
+    path('<str:tv_series_name_year>/', views.view_tv_series_name_year, name='view_tv_series_name_year'),
+    path('all/update', views.update_all_tv_series, name='update_all_tv_series'),
 ]

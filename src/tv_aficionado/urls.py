@@ -16,9 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tv_show import urls as tv_show_urls
+from tv_series import urls as tv_series_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('tv-show/', include(tv_show_urls)),
+    path('tv-series/', include(tv_series_urls)),
 ]
