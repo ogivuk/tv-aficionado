@@ -14,28 +14,28 @@ class HomePageVisitorTest(LiveServerTestCase):
 
     def test_can_open_tvshow_home_page(self):
         # User opens the landing page for TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         header_text = self.browser.find_element_by_tag_name('h1').text
 
-        # User notices TV Aficionado in the page title, and TV Shows in the page.
+        # User notices TV Aficionado in the page title, and TV Series in the page.
         self.assertIn('TV Aficionado',self.browser.title)
-        self.assertIn('TV Shows', header_text)
+        self.assertIn('TV Series', header_text)
 
     def test_home_page_displays_tv_shows_as_links_to_their_individual_pages(self):
         # Preparation: User first adds two TV shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The First TV Show")
         self.browser.find_element_by_id('id_year').send_keys("2018")
         self.browser.find_element_by_id('id_tvdb').send_keys("123456")
         self.browser.find_element_by_id('id_submit').click()
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The Second TV Show")
         self.browser.find_element_by_id('id_year').send_keys("2018")
         self.browser.find_element_by_id('id_tvdb').send_keys("123457")
         self.browser.find_element_by_id('id_submit').click()
 
         # User opens the landing page for TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # User sees the list of TV shows
         table = self.browser.find_element_by_id('id_tvshows_table')
@@ -44,20 +44,20 @@ class HomePageVisitorTest(LiveServerTestCase):
         # User sees the first TV show displayed as a Hyperlink
         ## rows[1] contains the first TV show entry, rows[0] has the table header
         link = rows[1].find_element_by_tag_name('a')
-        self.assertRegex(link.get_attribute("href"), r'/tv-show/')
+        self.assertRegex(link.get_attribute("href"), r'/tv-series/')
         self.assertIn(link.text, "The First TV Show (2018)")
         # User clicks on the link and gets taken to the individual page
         link.click()
         self.assertIn("The First TV Show (2018)", self.browser.title)
 
         # User opens again the landing page for TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         table = self.browser.find_element_by_id('id_tvshows_table')
         rows = table.find_elements_by_tag_name('tr')
 
         # User sees the second TV show displayed as a Hyperlink
         link = rows[2].find_element_by_tag_name('a')
-        self.assertRegex(link.get_attribute("href"), r'/tv-show/')
+        self.assertRegex(link.get_attribute("href"), r'/tv-series/')
         self.assertIn(link.text, "The Second TV Show (2018)")
         # User clicks on the link and gets taken to the individual page
         link.click()
@@ -65,19 +65,19 @@ class HomePageVisitorTest(LiveServerTestCase):
 
     def test_home_page_can_update_episode_information_for_all_tv_shows(self):
         # Preparation: User first adds two TV shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The First TV Show")
         self.browser.find_element_by_id('id_year').send_keys("2018")
         self.browser.find_element_by_id('id_tvdb').send_keys("123456")
         self.browser.find_element_by_id('id_submit').click()
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys("The Second TV Show")
         self.browser.find_element_by_id('id_year').send_keys("2018")
         self.browser.find_element_by_id('id_tvdb').send_keys("123457")
         self.browser.find_element_by_id('id_submit').click()
         
         # User opens the landing page for TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # User sees the TV shows, but with no information about the episodes
         table = self.browser.find_element_by_id('id_tvshows_table')
@@ -114,7 +114,7 @@ class HomePageVisitorTest(LiveServerTestCase):
         # The browser returns to the home page
         self.assertEqual(
             self.browser.current_url, 
-            self.live_server_url + '/tv-show/'
+            self.live_server_url + '/tv-series/'
         )
 
         # User sees the TV shows with updated information
@@ -145,37 +145,37 @@ class AddNewTVShowTest(LiveServerTestCase):
 
     def test_can_open_home_page_and_go_to_add_new_tvshow_page(self):
         # User opens the landing page for TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # User notices a link for adding a new TV Show
         link = self.browser.find_element_by_id('id_add_tv_show')
         
         # The link displays "Add new TV Show"
         self.assertEqual(link.text,"Add new TV Show")
-        # and it points to ".../tv-show/add/"
-        self.assertRegex(link.get_attribute("href"), r'/tv-show/add/$')
+        # and it points to ".../tv-series/add/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-series/add/$')
         
         # The user clicks on the link to open the page
         link.click()
 
         # The browser opens the page
-        self.assertRegex(self.browser.current_url, r'/tv-show/add/$')
+        self.assertRegex(self.browser.current_url, r'/tv-series/add/$')
 
     def test_can_open_tvshow_home_page_from_add_tvshow_page(self):
         # User opens the page for adding TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # User notices a link for going to the TV Show Home Page
         link = self.browser.find_element_by_id('id_link_to_home_page')
 
-        # The link points to ".../tv-show/"
-        self.assertRegex(link.get_attribute("href"), r'/tv-show/$')
+        # The link points to ".../tv-series/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-series/$')
 
         # The user clicks on the link to open the page
         link.click()
 
         # The browser opens the page
-        self.assertRegex(self.browser.current_url, r'/tv-show/$')
+        self.assertRegex(self.browser.current_url, r'/tv-series/$')
     
     def test_can_add_tvshow_and_retrieve_it_later(self):
         # helper variables holding TV show data
@@ -187,7 +187,7 @@ class AddNewTVShowTest(LiveServerTestCase):
         test_tvshow_url_id = '1' # Internal IDs always start from 1
         
         # User opens the page for adding new TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user is invited to enter the name of a new TV show
         inputbox = self.browser.find_element_by_id('id_name')
@@ -233,7 +233,7 @@ class AddNewTVShowTest(LiveServerTestCase):
         test_tvshow_urlarg_name = test_tvshow_name.replace(' ','-')
         self.assertEqual(
             self.browser.current_url, 
-            self.live_server_url + '/tv-show/add/' 
+            self.live_server_url + '/tv-series/add/' 
                 + f'?name={test_tvshow_urlarg_name}'
                 + f'&release_year={test_tvshow_year}'
                 + f'&tvdb_id={test_tvshow_thetvdb_id}'
@@ -253,7 +253,7 @@ class AddNewTVShowTest(LiveServerTestCase):
         self.assertEqual(messagebox.text, test_tvshow_display_name + " has been successfully added.")
 
         # The user opens the page with all TV shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # The user sees the name of the TV show in the list
         table = self.browser.find_element_by_id('id_tvshows_table')
@@ -262,7 +262,7 @@ class AddNewTVShowTest(LiveServerTestCase):
 
         # The user can access the page for TV show by name, where spaces are replaced with hyphens,
         # appended with release year.
-        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_name}/')
+        self.browser.get(self.live_server_url+f'/tv-series/{test_tvshow_url_name}/')
 
         # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -275,7 +275,7 @@ class AddNewTVShowTest(LiveServerTestCase):
         self.assertIn(test_tvshow_thetvdb_id, page_text)
 
         # The user can access the page for TV show by its id
-        self.browser.get(self.live_server_url+f'/tv-show/{test_tvshow_url_id}/')
+        self.browser.get(self.live_server_url+f'/tv-series/{test_tvshow_url_id}/')
 
         # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -297,14 +297,14 @@ class AddNewTVShowTest(LiveServerTestCase):
         test_tvshow_url_id = '1'
         
         # User opens the page with all TV shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # User does not see the new TV show in the list yet
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(test_tvshow_name, page_text)
 
         # User opens the page for adding new TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user enters the new TV show for the first time
         self.browser.find_element_by_id('id_name').send_keys(test_tvshow_name)
@@ -317,14 +317,14 @@ class AddNewTVShowTest(LiveServerTestCase):
         self.assertEqual(messagebox.text, test_tvshow_display_name + " has been successfully added.")
         
         # The user goes back to the starting page for TV shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # The user sees the new TV show in the list
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertIn(test_tvshow_name, page_text)
 
         # The user opens the page for adding new TV Shows for 2nd time
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user tries to enter the new TV show for the second time
         self.browser.find_element_by_id('id_name').send_keys(test_tvshow_name)
@@ -362,12 +362,12 @@ class AddNewTVShowValidateInputTest(LiveServerTestCase):
 
     def test_input_validation_user_cannot_save_TVshow_without_name(self):
         # User opens the page with all TV shows, and it does not see the new TV show
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
 
         # User opens the page for adding new TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user enters the new TV show, but without its name
         self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
@@ -385,18 +385,18 @@ class AddNewTVShowValidateInputTest(LiveServerTestCase):
         self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_thetvdb_id)
 
         # User opens the page with all TV shows, and it still does not see the new TV show
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
 
     def test_input_validation_user_cannot_save_TVshow_without_release_year(self):
         # User opens the page with all TV shows, and it does not see the new TV show
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
 
         # User opens the page for adding new TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user enters the new TV show, but without its release year
         self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
@@ -414,20 +414,20 @@ class AddNewTVShowValidateInputTest(LiveServerTestCase):
         self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_thetvdb_id)
 
         # User opens the page with all TV shows, and it still does not see the new TV show
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
     
     def test_input_validation_user_cannot_save_TVshow_without_tvdb_id(self):
         # User opens the page with all TV shows
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
 
         # User does not see the new TV show in the list yet
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
 
         # User opens the page for adding new TV Shows
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
 
         # The user enters the new TV show for the first time, but without its tvdb id
         self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
@@ -445,7 +445,7 @@ class AddNewTVShowValidateInputTest(LiveServerTestCase):
         self.assertEqual(inputbox.get_attribute('value'), self.test_tvshow_year)
 
         # User opens the page with all TV shows, and it still does not see the new TV show
-        self.browser.get(self.live_server_url+'/tv-show/')
+        self.browser.get(self.live_server_url+'/tv-series/')
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(self.test_tvshow_name, page_text)
 
@@ -467,7 +467,7 @@ class ViewTVShowTest(LiveServerTestCase):
 
     def test_tvshow_view_displays_all_parameters(self):
         # First, user adds a TV show
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
         self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
         self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
@@ -475,7 +475,7 @@ class ViewTVShowTest(LiveServerTestCase):
 
         # The user can access the page for TV show by name, 
         # where spaces are replaced with hyphens, appended with release year.
-        self.browser.get(self.live_server_url+f'/tv-show/{self.test_tvshow_url_name}/')
+        self.browser.get(self.live_server_url+f'/tv-series/{self.test_tvshow_url_name}/')
 
         # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -495,7 +495,7 @@ class ViewTVShowTest(LiveServerTestCase):
         self.assertTrue(int(tvshow_id) > 0)
 
         # The user can access the page for TV show by its internal ID
-        self.browser.get(self.live_server_url+f'/tv-show/{tvshow_id}/')
+        self.browser.get(self.live_server_url+f'/tv-series/{tvshow_id}/')
 
         # The user notices the name of TV show appended with release year in brackets in the page title and in the first <h1> tag
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -512,23 +512,23 @@ class ViewTVShowTest(LiveServerTestCase):
         
     def test_can_open_tvshow_home_page_from_tvshow_page(self):
         # First, user adds a TV show
-        self.browser.get(self.live_server_url+'/tv-show/add/')
+        self.browser.get(self.live_server_url+'/tv-series/add/')
         self.browser.find_element_by_id('id_name').send_keys(self.test_tvshow_name)
         self.browser.find_element_by_id('id_year').send_keys(self.test_tvshow_year)
         self.browser.find_element_by_id('id_tvdb').send_keys(self.test_tvshow_thetvdb_id)
         self.browser.find_element_by_id('id_submit').click()
 
         # User opens the page with the TV show information based on its name and year
-        self.browser.get(self.live_server_url+f'/tv-show/{self.test_tvshow_url_name}/')
+        self.browser.get(self.live_server_url+f'/tv-series/{self.test_tvshow_url_name}/')
 
         # User notices a link for going to the TV Show Home Page
         link = self.browser.find_element_by_id('id_link_to_home_page')
 
-        # The link points to ".../tv-show/"
-        self.assertRegex(link.get_attribute("href"), r'/tv-show/$')
+        # The link points to ".../tv-series/"
+        self.assertRegex(link.get_attribute("href"), r'/tv-series/$')
 
         # The user clicks on the link to open the page
         link.click()
 
         # The browser opens the page
-        self.assertRegex(self.browser.current_url, r'/tv-show/$')
+        self.assertRegex(self.browser.current_url, r'/tv-series/$')
